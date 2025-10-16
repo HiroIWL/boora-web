@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import SelectUser from './select-user-page';
 
-export function Page() {
+export default async function Page() {
     return (
         <Suspense>
             <SelectUser />
