@@ -10,6 +10,8 @@ export function middleware(req: NextRequest) {
         '/select-user',
         '/_next',
         '/favicon.ico',
+        '/public',
+        '/static',
         '/api',
     ];
 

@@ -95,7 +95,11 @@ export function DesafioVisaoProfessor() {
             <Typography variant="title" color="black" weight="bold">
                 Gerenciar Desafios
             </Typography>
-            <Container direction="column" gap={6} className="w-lg max-w-lg max-h-[500px] overflow-scroll">
+            <Container
+                direction="column"
+                gap={6}
+                className="w-lg max-w-lg max-h-[500px]"
+            >
                 {desafios.map((desafio) => (
                     <Container
                         key={desafio.id}
