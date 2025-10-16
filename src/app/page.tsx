@@ -61,7 +61,7 @@ export default function Home() {
                 className="w-1/2 relative overflow-hidden"
             >
                 <Image
-                    src="/people.jpg"
+                    src="/static/people.jpg"
                     alt="Ilustração pessoas se exercitando"
                     width={2048}
                     height={2048}
