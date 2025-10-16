@@ -1,24 +1,13 @@
-o **boora-web** e o **boora-mobile** são **duas interfaces da mesma aplicação**, voltadas tanto para **alunos** quanto **professores**, consumindo o **mesmo backend (boora-back)**. o backend faz toda a gestão de autenticação, roles e dados.
-ou seja:
-**web = versão desktop**
-**mobile = versão app**
-**back = api única**
-
-a seguir, o README corrigido, direto e limpo pra pôr no repositório **boora-web**:
-
----
-
-````markdown
 # 🎓 Boora
 
-Boora é uma plataforma educacional completa para **alunos e professores**, disponível em versão **web** e **mobile**, com um único backend centralizado.  
-O sistema permite criação, envio e avaliação de **desafios**, além de gerenciamento de **turmas** e **entregas**.
+Boora é uma plataforma educacional voltada para **alunos e professores**, disponível nas versões **web** e **mobile**, ambas consumindo um **único backend centralizado**.  
+O sistema permite criação, envio e avaliação de **desafios**, além do gerenciamento de **turmas** e **entregas**.
 
 ---
 
-## 🧩 Estrutura do Projeto
+## 🧩 Estrutura Geral
 
-Boora é formado por **três repositórios** independentes que se integram entre si:
+Boora é composta por **três aplicações independentes**, integradas por uma **API única**:
 
 | Projeto             | Descrição                                  | Repositório                                                                |
 | ------------------- | ------------------------------------------ | -------------------------------------------------------------------------- |
@@ -26,25 +15,44 @@ Boora é formado por **três repositórios** independentes que se integram entre
 | 📱 **boora-mobile** | Aplicativo mobile (Expo + NativeWind)      | [github.com/HiroIWL/boora-mobile](https://github.com/HiroIWL/boora-mobile) |
 | ⚙️ **boora-back**   | API central (NestJS + Prisma + PostgreSQL) | [github.com/HiroIWL/boora-back](https://github.com/HiroIWL/boora-back)     |
 
-Tanto o **boora-web** quanto o **boora-mobile** atendem **professores e alunos**, compartilhando as mesmas regras de negócio e comunicação com a **API única**.
+Tanto o **boora-web** quanto o **boora-mobile** atendem **professores e alunos**, com o mesmo conjunto de funcionalidades e autenticação centralizada via **boora-back**.
 
 ---
 
-## ⚙️ Backend
+## ⚙️ Backend — `boora-back`
 
-A API (**boora-back**) é construída em **NestJS** com **Prisma ORM** e **PostgreSQL**.
+A API é desenvolvida em **NestJS**, com **Prisma ORM** e **PostgreSQL**.  
+Toda a autenticação, controle de roles e lógica de negócios residem aqui.
 
 ### 🔐 Autenticação e Roles
 
--   Baseada em **JWT**
--   Usuários com roles:
+-   Autenticação via **JWT**
+-   Roles de usuário:
     -   `ALUNO`
     -   `PROFESSOR`
--   Rotas protegidas via `@Roles()` e guards personalizados
+-   Proteção de rotas com **guards** e decorators `@Roles()`
 
-### 🗄️ Estrutura de Banco (Prisma)
+### 🧱 Estrutura de Pastas
 
-Modelagem principal:
+```
+
+src/
+├─ auth/ → autenticação e geração de tokens JWT
+├─ dtos/ → data transfer objects compartilhados
+├─ enums/ → enums globais (ex: TipoUsuario)
+├─ modules/
+│ ├─ desafio/ → lógica de desafios
+│ ├─ entrega/ → lógica de entregas
+│ ├─ ranking/ → lógica de pontuação
+│ ├─ turma/ → controle de turmas
+│ └─ usuario/ → controle de usuários
+├─ prisma/ → acesso direto ao client do Prisma
+├─ app.module.ts
+└─ main.ts
+
+```
+
+### 🗄️ Modelagem de Banco (Prisma)
 
 ```prisma
 model Usuario {
@@ -92,52 +100,86 @@ model Entrega {
   @@unique([id_desafio, id_usuario_aluno])
 }
 ```
-````
 
 ---
 
-## 🌐 Frontend (boora-web)
+## 🌐 Frontend — `boora-web`
 
-Interface feita com **Next.js** e **TailwindCSS**.
-Focada em oferecer a mesma experiência que o aplicativo mobile, adaptada para navegador.
+Interface web construída com **Next.js (App Router)** e **TailwindCSS**, focada em fornecer a mesma experiência visual e lógica do aplicativo mobile.
 
 ### 🔧 Stack
 
--   **Next.js (App Router)**
+-   **Next.js 14+ (App Router)**
 -   **TypeScript**
 -   **TailwindCSS**
--   **JWT Auth Middleware**
--   **Axios + Context API** para comunicação com a API
--   **Design System próprio** compartilhado com o app mobile
+-   **Axios** + **Context API** para consumo da API
+-   **Middleware JWT** para rotas protegidas
+-   **Design System compartilhado** com o app mobile
 
-### 📁 Estrutura
+### 📂 Estrutura de Pastas
 
 ```
 src/
- ├─ components/     → componentes reutilizáveis (Button, Container, Modal, Typography...)
- ├─ hooks/          → hooks compartilhados (auth, userType, etc)
- ├─ context/        → contexto global (usuário, tema, etc)
- ├─ lib/            → funções utilitárias
- ├─ styles/         → configuração Tailwind e tokens de cor
- └─ pages/          → rotas principais
+ ├─ app/
+ │   ├─ api/            → endpoints internos (Next API routes)
+ │   │   ├─ desafios/
+ │   │   ├─ entregas/
+ │   │   ├─ ranking/
+ │   │   ├─ turmas/
+ │   │   ├─ login/
+ │   │   ├─ logout/
+ │   │   ├─ register/
+ │   │   └─ me/
+ │   ├─ desafios/        → páginas de desafios
+ │   ├─ entregas/        → páginas de entregas
+ │   ├─ ranking/         → visualização de ranking
+ │   ├─ login/           → tela de login
+ │   ├─ register/        → tela de cadastro
+ │   ├─ select-user/     → seleção de tipo de usuário
+ │   ├─ layout.tsx
+ │   └─ page.tsx
+ ├─ components/          → componentes reutilizáveis (Button, Modal, Typography, Container, etc)
+ ├─ context/             → contextos globais (auth, tipo de usuário, etc)
+ ├─ lib/                 → funções utilitárias
+ ├─ models/              → tipagens e entidades
+ ├─ services/            → comunicação com a API
+ └─ styles/              → configuração Tailwind e temas
 ```
-
-### 🎨 Design System
-
-O design system é baseado em **Tailwind**, refletido também no mobile via **NativeWind**.
-Isso permite que ambos (web e app) usem a mesma base de componentes e estilos, com comportamento idêntico.
 
 ---
 
-## 📱 Mobile (boora-mobile)
+## 📱 Mobile — `boora-mobile`
 
-Aplicativo em **Expo**, com a mesma lógica e experiência do boora-web.
-Utiliza **NativeWind** para estilização e os mesmos padrões de UI do front web.
+Aplicativo desenvolvido com **Expo** e **NativeWind**, mantendo a mesma lógica e fluxo do web.
+Utiliza os mesmos contextos, serviços e design system adaptado para React Native.
 
--   Framework: **React Native / Expo**
--   Estilo: **NativeWind**
--   Integração direta com a **API do boora-back**
--   Reuso de lógica e design system do web
+### 🔧 Stack
+
+-   **Expo (React Native)**
+-   **TypeScript**
+-   **NativeWind**
+-   **Axios + Context API**
+-   **Rotas com Expo Router**
+-   **Reaproveitamento de UI e serviços do web**
+
+### 📂 Estrutura de Pastas
+
+```
+app/
+ ├─ desafios/        → listagem e visualização de desafios
+ ├─ entregas/        → envio e histórico de entregas
+ ├─ ranking/         → ranking geral
+ ├─ login/           → tela de login
+ ├─ register/        → cadastro
+ ├─ select-user/     → escolha do tipo de usuário
+ ├─ _layout.tsx
+ └─ index.tsx
+components/          → componentes reutilizáveis
+context/             → contexto global (usuário, auth, etc)
+lib/                 → funções utilitárias
+services/            → consumo da API
+assets/              → imagens e ícones
+```
 
 ---
 
@@ -151,18 +193,8 @@ Utiliza **NativeWind** para estilização e os mesmos padrões de UI do front we
                      [ PostgreSQL ]
 ```
 
-Todos os dados (usuários, turmas, desafios, entregas) passam pelo **boora-back**, que controla permissões e roles.
-O front (web e mobile) apenas consome e exibe os dados, mantendo paridade de funcionalidades.
-
----
-
-## 🧠 Conceitos-Chave
-
--   **Código unificado:** mesmo domínio, diferentes interfaces.
--   **Design system compartilhado:** Tailwind ↔ NativeWind.
--   **Autenticação JWT**: um único login para todas as plataformas.
--   **Controle de roles**: `ALUNO` e `PROFESSOR` com permissões distintas.
--   **Backend centralizado:** API única com Prisma + PostgreSQL.
+O **boora-back** centraliza toda a lógica e autenticação,
+enquanto o **boora-web** e o **boora-mobile** compartilham código, UI e comportamento.
 
 ---
 
@@ -172,7 +204,7 @@ O front (web e mobile) apenas consome e exibe os dados, mantendo paridade de fun
 # Instalar dependências
 yarn install
 
-# Rodar ambiente local
+# Rodar em desenvolvimento
 yarn dev
 
 # Build de produção
@@ -184,3 +216,20 @@ Crie um arquivo `.env.local` com:
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
+
+---
+
+## 🌍 Deploy
+
+-   Frontend: [https://boora-web.vercel.app](https://boora-web.vercel.app)
+-   Backend: [https://boora-back.vercel.app](https://boora-back.vercel.app)
+
+---
+
+## 🧠 Conceitos-Chave
+
+-   **Mesma lógica, múltiplas interfaces:** web e mobile funcionam de forma idêntica.
+-   **Design System compartilhado:** Tailwind ↔ NativeWind.
+-   **Autenticação JWT:** sessão única e segura.
+-   **API única:** centralização de dados e regras de negócio.
+-   **Arquitetura modular:** separação clara entre camadas.
