@@ -1,20 +1,64 @@
-interface FormInputProps {
+'use client';
+
+import React, { useId } from 'react';
+import { cn } from '@/lib/utils';
+import { Container } from './Container';
+import { Typography } from './Typography';
+
+interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
-    placeholder: string;
-    type?: string;
+    error?: string;
+    maxLength?: number;
 }
 
-export default function FormInput({ label, placeholder, type = "text" }: FormInputProps) {
+export function FormInput({
+    label,
+    type = 'text',
+    id,
+    error,
+    className,
+    maxLength,
+    ...props
+}: FormInputProps) {
+    const generatedId = useId();
+    const inputId = id || generatedId;
+
     return (
-        <div className="mb-6 w-full">
-            <label className="block text-base font-medium text-gray-800 mb-2">
+        <Container direction="column" gap={2} className="w-full">
+            <Typography
+                variant="label"
+                color="black"
+                weight="semibold"
+                htmlFor={inputId}
+            >
                 {label}
-            </label>
+            </Typography>
+
             <input
+                id={inputId}
                 type={type}
-                placeholder={placeholder}
-                className="w-full border border-gray-400 rounded-md px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                maxLength={maxLength}
+                className={cn(
+                    'w-full border rounded-md px-4 py-3 text-gray-900 placeholder-gray-400',
+                    'focus:outline-none focus:ring-2 focus:ring-[#FF8C00] transition',
+                    error
+                        ? 'border-red-500 focus:ring-red-400'
+                        : 'border-gray-300',
+                    className
+                )}
+                {...props}
             />
-        </div>
+
+            {error && (
+                <Typography
+                    variant="caption"
+                    color="primary"
+                    weight="regular"
+                    className="text-red-500 mt-1"
+                >
+                    {error}
+                </Typography>
+            )}
+        </Container>
     );
 }

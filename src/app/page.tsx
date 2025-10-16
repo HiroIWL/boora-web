@@ -1,43 +1,74 @@
-import Image from "next/image";
-import Link from "next/link";
+import { ButtonLink, Container, Typography } from '@/components';
+import Image from 'next/image';
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen">
-      <div className="w-1/2 bg-white flex flex-col justify-center items-center text-center px-12 relative z-10">
-        <h1 className="text-5xl font-bold text-orange-500 mb-6">Boora !</h1>
+    return (
+        <Container
+            align="stretch"
+            className="min-h-screen flex"
+            fluid={true}
+            padding="none"
+            bg="white"
+        >
+            <Container
+                direction="column"
+                align="center"
+                justify="center"
+                gap={6}
+                className="w-1/2 text-center relative z-10"
+            >
+                <Typography variant="headline" color="primary" weight="bold">
+                    Boora !
+                </Typography>
 
-        <p className="text-orange-500 text-xl mb-10 max-w-md">
-          Toda semana um novo desafio pra você se movimentar, acumular pontos e
-          subir no ranking da turma!
-        </p>
+                <Typography
+                    variant="text"
+                    color="primary"
+                    className="max-w-md mb-8"
+                >
+                    Toda semana um novo desafio pra você se movimentar, acumular
+                    pontos e subir no ranking da turma!
+                </Typography>
 
-        <div className="flex flex-col gap-4 w-full max-w-xs">
-          <Link
-            href="/signup"
-            className="bg-blue-500 text-white font-semibold py-3 rounded-md hover:bg-blue-600 transition"
-          >
-            Criar conta
-          </Link>
-          <Link
-            href="/login"
-            className="bg-orange-500 text-white font-semibold py-3 rounded-md hover:bg-orange-600 transition"
-          >
-            Já tenho conta
-          </Link>
-        </div>
-      </div>
+                <Container
+                    direction="column"
+                    gap={2}
+                    className="w-full max-w-xs"
+                >
+                    <ButtonLink
+                        href="/select-user?criar=1"
+                        variant="info"
+                        textColor="white"
+                    >
+                        Criar conta
+                    </ButtonLink>
 
-      <div className="w-1/2 relative flex items-center justify-center bg-green-600 overflow-hidden">
-        <Image
-          src="/people.jpg"
-          alt="Ilustração pessoas se exercitando"
-          width={500}
-          height={500}
-          className="object-contain relative z-10"
-          priority
-        />
-      </div>
-    </main>
-  );
+                    <ButtonLink
+                        href="/select-user"
+                        variant="primary"
+                        textColor="white"
+                    >
+                        Já tenho conta
+                    </ButtonLink>
+                </Container>
+            </Container>
+
+            <Container
+                padding="none"
+                bg="primary"
+                align="center"
+                justify="center"
+                className="w-1/2 relative overflow-hidden"
+            >
+                <Image
+                    src="/people.jpg"
+                    alt="Ilustração pessoas se exercitando"
+                    width={2048}
+                    height={2048}
+                    className="object-contain relative z-10 w-full"
+                    priority
+                />
+            </Container>
+        </Container>
+    );
 }

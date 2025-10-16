@@ -1,33 +1,117 @@
-import Link from "next/link";
-import Header from "@/components/Header";
-import FormInput from "@/components/FormInput";
+'use client';
+
+import { useEffect, useState, useTransition } from 'react';
+import {
+    Container,
+    Typography,
+    Header,
+    FormContainer,
+    FormInput,
+    Button,
+} from '@/components';
+import { loginUserAction, logOut } from './actions';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useUserType } from '@/context/UserTypeContext';
+import { useAuthenticated } from '@/context/AuthenticatedContext';
 
 export default function Login() {
+    const router = useRouter();
+    const [error, setError] = useState('');
+    const [pending, startTransition] = useTransition();
+    const { userType } = useUserType();
+    const { setIsAuthenticated } = useAuthenticated();
+
+    function handleSubmit(formData: FormData) {
+        startTransition(async () => {
+            setError('');
+            try {
+                await loginUserAction(formData);
+                setIsAuthenticated(true);
+
+                router.push('/desafios');
+            } catch {
+                setError('Credenciais inválidas. Tente novamente.');
+            }
+        });
+    }
+
+    useEffect(() => {
+        if (!userType) {
+            router.replace('/select-user');
+        }
+    }, []);
+
     return (
-        <main className="flex flex-col min-h-screen bg-white px-6">
-            <div className="pt-12">
+        <Container
+            direction="column"
+            bg="white"
+            padding="md"
+            className="min-h-screen"
+            fluid={true}
+        >
+            <Container direction="column" className="pt-12 pb-12">
                 <Header />
-            </div>
+            </Container>
 
-            <div className="flex flex-1 flex-col justify-center items-center w-full max-w-md mx-auto">
-                <h2 className=" text-lg text-gray-800 font-bold mb-6">Entrar</h2>
+            <Container
+                className="w-full max-w-md"
+                direction="column"
+                align="center"
+                // gap={10}
+            >
+                <Typography
+                    variant="subtitle"
+                    weight="bold"
+                    color="black"
+                    className="mb-12"
+                >
+                    Entrar
+                </Typography>
 
-                <form className="w-full">
-                    <FormInput label="E-mail" placeholder="Digite seu e-mail" type="email" />
-                    <FormInput label="Senha" placeholder="Digite sua senha" type="password" />
+                <FormContainer action={handleSubmit} gap={6}>
+                    <FormInput
+                        name="registro_academico"
+                        label="Registro Acadêmico"
+                        placeholder="Digite seu RA"
+                        maxLength={6}
+                    />
 
-                    <button
+                    <FormInput
+                        name="senha"
+                        label="Senha"
+                        type="password"
+                        placeholder="Digite sua senha"
+                    />
+
+                    {error && (
+                        <Typography
+                            variant="caption"
+                            color="primary"
+                            className="text-red-500"
+                        >
+                            {error}
+                        </Typography>
+                    )}
+
+                    <Button
                         type="submit"
-                        className="w-full bg-orange-500 text-white font-semibold py-3 rounded-md hover:bg-orange-600 transition mb-4"
+                        variant="primary"
+                        textColor="white"
+                        className="mt-4"
+                        disabled={pending}
                     >
-                        Entrar
-                    </button>
-                </form>
+                        {pending ? 'Entrando...' : 'Entrar'}
+                    </Button>
+                </FormContainer>
 
-                <Link href="/signup" className="text-blue-600 hover:underline text-sm">
+                <Link
+                    href="/register"
+                    className="text-blue-600 hover:underline text-sm mt-4"
+                >
                     Não tem conta? Criar agora
                 </Link>
-            </div>
-        </main>
+            </Container>
+        </Container>
     );
 }
