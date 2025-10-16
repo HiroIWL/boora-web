@@ -61,9 +61,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     function logout() {
         fetch('/api/logout', { method: 'POST' }).then(() => {
+            router.push('/');
             setUser(null);
             setUserType('ALUNO');
-            router.push('/');
         });
     }
 
